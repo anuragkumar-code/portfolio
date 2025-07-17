@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Portfolio Chat Design System - Dark Theme with Tech Focus */
+
+@layer base {
+  :root {
+    /* Dark Portfolio Theme */
+    --background: 222 84% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 224 71% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 71% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 92% 65%;
+    --primary-foreground: 222 84% 4%;
+    --primary-glow: 217 92% 75%;
+
+    --secondary: 215 27% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 27% 12%;
+    --muted-foreground: 217 10% 64%;
+
+    --accent: 217 92% 65%;
+    --accent-foreground: 222 84% 4%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 27% 17%;
+    --input: 215 27% 12%;
+    --ring: 217 92% 65%;
+
+    --radius: 0.75rem;
+
+    /* Custom Portfolio Colors */
+    --chat-user: 217 92% 65%;
+    --chat-assistant: 215 27% 17%;
+    --chat-input: 215 27% 12%;
+    --social-hover: 217 92% 75%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 92% 65%), hsl(217 92% 45%));
+    --gradient-background: linear-gradient(135deg, hsl(222 84% 4%), hsl(224 71% 8%));
+    --gradient-card: linear-gradient(135deg, hsl(224 71% 8%), hsl(215 27% 12%));
+    
+    /* Shadows */
+    --shadow-glow: 0 0 30px hsl(217 92% 65% / 0.3);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --sidebar-background: 215 27% 17%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 92% 65%;
+    --sidebar-primary-foreground: 222 84% 4%;
+    --sidebar-accent: 215 27% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 27% 17%;
+    --sidebar-ring: 217 92% 65%;
+  }
+
+  .dark {
+    /* Already dark theme - keeping the same values */
+    --background: 222 84% 4%;
+    --foreground: 210 40% 98%;
+    --card: 224 71% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 71% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 92% 65%;
+    --primary-foreground: 222 84% 4%;
+    --secondary: 215 27% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 27% 12%;
+    --muted-foreground: 217 10% 64%;
+    --accent: 217 92% 65%;
+    --accent-foreground: 222 84% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 27% 17%;
+    --input: 215 27% 12%;
+    --ring: 217 92% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/50 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/70;
+  }
+}
+
+@layer components {
+  .chat-message-enter {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .glow-effect {
+    position: relative;
+  }
+  
+  .glow-effect::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-primary);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .glow-effect:hover::before {
+    opacity: 1;
+  }
+}
