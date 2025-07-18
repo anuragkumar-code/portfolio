@@ -10,25 +10,25 @@ const PortfolioHeader = ({ onResumeClick }: PortfolioHeaderProps) => {
   const socialLinks = [
     {
       icon: Twitter,
-      href: "#", // Replace with your Twitter URL
+      href: "https://x.com/_anuragkumar",
       label: "Twitter",
       color: "hover:text-blue-400"
     },
     {
       icon: Linkedin,
-      href: "#", // Replace with your LinkedIn URL
+      href: "https://www.linkedin.com/in/anurag-kumar-03473a1a3",
       label: "LinkedIn", 
       color: "hover:text-blue-600"
     },
     {
       icon: Github,
-      href: "#", // Replace with your GitHub URL
+      href: "https://github.com/anuragkumar-code", 
       label: "GitHub",
       color: "hover:text-purple-400"
     },
     {
       icon: Mail,
-      href: "mailto:your.email@example.com", // Replace with your email
+      href: "mailto:kumar.mairwa@gmail.com", 
       label: "Email",
       color: "hover:text-green-400"
     }
@@ -42,7 +42,7 @@ const PortfolioHeader = ({ onResumeClick }: PortfolioHeaderProps) => {
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-full bg-gradient-primary animate-glow-pulse"></div>
             <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Portfolio AI
+              Jarwis
             </h1>
           </div>
 
