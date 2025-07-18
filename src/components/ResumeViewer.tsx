@@ -13,7 +13,8 @@ const ResumeViewer = ({ isOpen, onClose }: ResumeViewerProps) => {
   const [isLoading, setIsLoading] = useState(true);
   
   // Replace with your actual resume PDF URL
-  const resumeUrl = "/anurag.pdf";
+  // const resumeUrl = "/anurag.pdf";
+  const resumeUrl = `${import.meta.env.BASE_URL}anurag.pdf`;
 
   const handleDownload = () => {
     const link = document.createElement('a');
