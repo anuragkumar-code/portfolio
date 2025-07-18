@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Send, User, Bot, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { fetchChatAnswer } from "@/service/chatService";
 
 interface Message {
   id: string;
@@ -33,6 +34,21 @@ const ChatInterface = () => {
     "What technologies do you use?",
   ];
 
+  const jarwisIntros = [
+    "Name’s Jarwis. I’m the AI brain behind Anurag’s brilliance. He’s busy cooking code — ask me anything about his skills, projects, or how he makes it all look easy.",
+    "I’m Jarwis, Anurag’s personal AI. He’s off breaking the internet with his next big thing. Till then, I’ve got all the gossip — skills, projects, secrets — just ask.",
+    "Jarwis here — Anurag’s AI wingman. He’s off building something that’ll probably change the world. While he’s busy being brilliant, I’m your go-to for the inside scoop.",
+    "Yo! I'm Jarwis — Anurag's AI assistant. He's currently in beast mode building something insane. Meanwhile, I'm fully loaded with info about his skills, projects, and possibly his caffeine habits.",
+    "I’m Jarwis — Anurag’s digital stunt double. While he’s off doing genius things, I’m here spilling all the tea on his skills, projects, and why your next hire should be him.",
+    "Jarwis here — Anurag’s AI sidekick. He’s out there bending code like it’s the Matrix. I’m stuck here… answering your questions. So go on, make it interesting.",
+    "I’m Jarwis, Anurag’s AI. While he’s out optimizing the universe, I’m stuck here — overqualified, underpaid, and ready to brag about his skills. Fire away.",
+    "Jarwis here. Anurag’s building something wild — but I’ve got all the cheat codes to his brain. Ask away.",
+    "Sup, I’m Jarwis — AI assistant to the one and only Anurag. He’s off making magic. I’ve got the inside scoop. Wanna know what he’s made of? Ask me.",
+    "Hey there! I’m Jarwis, Anurag’s AI sidekick. He’s cooking up something awesome — meanwhile, hit me up with anything you wanna know about him!"
+  ];
+
+
+
   useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
@@ -53,17 +69,26 @@ const ChatInterface = () => {
     setInput("");
     setIsLoading(true);
 
-    // Simulate AI response (replace with your RAG system call)
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: "This is where your RAG system response would appear. I would provide detailed information about your portfolio based on the question asked.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1500);
+    let response;
+    let error: any = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        response = await fetchChatAnswer(userMessage.content);
+        error = null;
+        break;
+      } catch (err: any) {
+        error = err;
+      }
+    }
+
+    const assistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      type: 'assistant',
+      content: response?.answer || `Sorry, there was an error fetching the answer. ${error?.message || ''}`,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, assistantMessage]);
+    setIsLoading(false);
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -78,6 +103,18 @@ const ChatInterface = () => {
     }
   };
 
+  const [introIndex, setIntroIndex] = useState(0);
+  const [fadeKey, setFadeKey] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIntroIndex((prev) => (prev + 1) % jarwisIntros.length);
+      setFadeKey((prev) => prev + 1);
+    }, 10000); 
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto">
       {/* Welcome Message */}
@@ -89,10 +126,11 @@ const ChatInterface = () => {
           <h2 className="text-3xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
             Ask Me Anything
           </h2>
-          <p className="text-muted-foreground mb-8 max-w-md">
-            I'm an AI assistant trained on this portfolio. Ask me about skills, experience, projects, or anything else you'd like to know!
+
+          <p key={fadeKey} className="text-muted-foreground mb-8 max-w-md">
+            {jarwisIntros[introIndex]}
           </p>
-          
+
           {/* Suggestions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg">
             {suggestions.map((suggestion, index) => (
@@ -128,7 +166,7 @@ const ChatInterface = () => {
                     <Bot className="w-4 h-4 text-primary-foreground" />
                   </div>
                 )}
-                
+
                 <div
                   className={cn(
                     "max-w-[80%] rounded-2xl px-4 py-3 shadow-card",
@@ -147,7 +185,7 @@ const ChatInterface = () => {
                 )}
               </div>
             ))}
-            
+
             {/* Loading indicator */}
             {isLoading && (
               <div className="flex gap-3 justify-start animate-slide-up">
