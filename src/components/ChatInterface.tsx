@@ -26,13 +26,37 @@ const ChatInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const suggestions = [
-    "What are your main skills?",
-    "Tell me about your experience",
-    "What projects have you worked on?",
-    "What technologies do you use?",
+  const [suggestionIndex, setSuggestionIndex] = useState(0);
+
+  const suggestionGroups = [
+    [
+      "What are Anurag's strongest skills?",
+      "Can you walk me through Anurag's experience?",
+      "Tell me about some standout projects Anurag has worked on.",
+      "Which technologies does Anurag use the most?",
+    ],
+    [
+      "What kind of roles is Anurag best suited for?",
+      "How does Anurag approach problem-solving?",
+      "What makes Anurag different from other developers?",
+      "Can you describe Anurag's coding style or philosophy?",
+    ],
+    [
+      "What’s Anurag’s proudest project?",
+      "How does Anurag stay updated with tech?",
+      "Has Anurag worked in a team setting?",
+      "What’s Anurag like as a developer?",
+    ],
+    [
+      "Why should someone hire Anurag?",
+      "Tell me about Anurag’s frontend skills.",
+      "What backend technologies does Anurag know?",
+      "What’s the most impressive thing Anurag has built?",
+    ]
   ];
+
 
   const jarwisIntros = [
     "Name’s Jarwis. I’m the AI brain behind Anurag’s brilliance. He’s busy cooking code — ask me anything about his skills, projects, or how he makes it all look easy.",
@@ -94,6 +118,10 @@ const ChatInterface = () => {
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
     inputRef.current?.focus();
+
+    setTimeout(() => {
+      handleSend();
+    }, 100); 
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -109,8 +137,9 @@ const ChatInterface = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setIntroIndex((prev) => (prev + 1) % jarwisIntros.length);
+      setSuggestionIndex((prev) => (prev + 1) % suggestionGroups.length);
       setFadeKey((prev) => prev + 1);
-    }, 10000); 
+    }, 15000); 
 
     return () => clearInterval(interval);
   }, []);
@@ -133,11 +162,14 @@ const ChatInterface = () => {
 
           {/* Suggestions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg">
-            {suggestions.map((suggestion, index) => (
+            {suggestionGroups[suggestionIndex].map((suggestion, index) => (
+            // {suggestions.map((suggestion, index) => (
               <Button
                 key={index}
                 variant="outline"
-                className="text-left justify-start h-auto p-4 hover:bg-secondary transition-all duration-300 animate-slide-up"
+                className="text-left justify-start h-auto p-4 hover:bg-secondary transition-all duration-300 animate-slide-up whitespace-normal break-words text-sm"
+
+                // className="text-left justify-start h-auto p-4 hover:bg-secondary transition-all duration-300 animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => handleSuggestionClick(suggestion)}
               >
