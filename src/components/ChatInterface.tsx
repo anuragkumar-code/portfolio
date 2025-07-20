@@ -245,7 +245,7 @@ const ChatInterface = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask me anything about this portfolio..."
+            placeholder="Ask me anything about anurag..."
             className="flex-1 bg-chat-input border-border focus:border-primary transition-colors"
             disabled={isLoading}
           />
