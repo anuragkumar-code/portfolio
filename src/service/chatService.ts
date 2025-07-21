@@ -1,15 +1,14 @@
-// src/service/chatService.ts
-
 export interface ChatResponse {
   answer: string;
 }
 
 export async function fetchChatAnswer(query: string): Promise<ChatResponse> {
   try {
-    const response = await fetch("https://portfolio-backend-jbgb.onrender.com/api/chat", {
+    const response = await fetch(import.meta.env.VITE_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": import.meta.env.VITE_API_KEY,
       },
       body: JSON.stringify({ query }),
     });
