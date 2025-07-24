@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PortfolioHeader from "@/components/PortfolioHeader";
 import ChatInterface from "@/components/ChatInterface";
 import ResumeViewer from "@/components/ResumeViewer";
+import { wakeBackend } from "@/service/wakeService";
 
 const Index = () => {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
+
+  useEffect(() => {
+    wakeBackend();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-background text-foreground">
