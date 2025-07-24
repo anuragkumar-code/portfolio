@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send, User, Bot, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,27 +57,43 @@ const ChatInterface = () => {
     ]
   ];
 
-
   const jarwisIntros = [
-    "Name’s Jarwis. I’m the AI brain behind Anurag’s brilliance. He’s busy cooking code — ask me anything about his skills, projects, or how he makes it all look easy.",
-    "I’m Jarwis, Anurag’s personal AI. He’s off breaking the internet with his next big thing. Till then, I’ve got all the gossip — skills, projects, secrets — just ask.",
-    "Jarwis here — Anurag’s AI wingman. He’s off building something that’ll probably change the world. While he’s busy being brilliant, I’m your go-to for the inside scoop.",
-    "Yo! I'm Jarwis — Anurag's AI assistant. He's currently in beast mode building something insane. Meanwhile, I'm fully loaded with info about his skills, projects, and possibly his caffeine habits.",
-    "I’m Jarwis — Anurag’s digital stunt double. While he’s off doing genius things, I’m here spilling all the tea on his skills, projects, and why your next hire should be him.",
-    "Jarwis here — Anurag’s AI sidekick. He’s out there bending code like it’s the Matrix. I’m stuck here… answering your questions. So go on, make it interesting.",
-    "I’m Jarwis, Anurag’s AI. While he’s out optimizing the universe, I’m stuck here — overqualified, underpaid, and ready to brag about his skills. Fire away.",
-    "Jarwis here. Anurag’s building something wild — but I’ve got all the cheat codes to his brain. Ask away.",
-    "Sup, I’m Jarwis — AI assistant to the one and only Anurag. He’s off making magic. I’ve got the inside scoop. Wanna know what he’s made of? Ask me.",
-    "Hey there! I’m Jarwis, Anurag’s AI sidekick. He’s cooking up something awesome — meanwhile, hit me up with anything you wanna know about him!"
+    "Name’s Jarwis. I’m the AI brain behind Anurag’s brilliance...",
+    "I’m Jarwis, Anurag’s personal AI...",
+    "Jarwis here — Anurag’s AI wingman...",
+    "Yo! I'm Jarwis — Anurag's AI assistant...",
+    "I’m Jarwis — Anurag’s digital stunt double...",
+    "Jarwis here — Anurag’s AI sidekick...",
+    "I’m Jarwis, Anurag’s AI...",
+    "Jarwis here. Anurag’s building something wild...",
+    "Sup, I’m Jarwis — AI assistant to the one and only Anurag...",
+    "Hey there! I’m Jarwis, Anurag’s AI sidekick..."
   ];
 
-
+  const [introIndex, setIntroIndex] = useState(0);
+  const [fadeKey, setFadeKey] = useState(0);
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.focus();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIntroIndex((prev) => (prev + 1) % jarwisIntros.length);
+      setSuggestionIndex((prev) => (prev + 1) % suggestionGroups.length);
+      setFadeKey((prev) => prev + 1);
+    }, 20000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -118,10 +134,9 @@ const ChatInterface = () => {
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
     inputRef.current?.focus();
-
     setTimeout(() => {
       handleSend();
-    }, 100); 
+    }, 100);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -130,19 +145,6 @@ const ChatInterface = () => {
       handleSend();
     }
   };
-
-  const [introIndex, setIntroIndex] = useState(0);
-  const [fadeKey, setFadeKey] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIntroIndex((prev) => (prev + 1) % jarwisIntros.length);
-      setSuggestionIndex((prev) => (prev + 1) % suggestionGroups.length);
-      setFadeKey((prev) => prev + 1);
-    }, 15000); 
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto">
@@ -160,16 +162,12 @@ const ChatInterface = () => {
             {jarwisIntros[introIndex]}
           </p>
 
-          {/* Suggestions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg">
             {suggestionGroups[suggestionIndex].map((suggestion, index) => (
-            // {suggestions.map((suggestion, index) => (
               <Button
                 key={index}
                 variant="outline"
                 className="text-left justify-start h-auto p-4 hover:bg-secondary transition-all duration-300 animate-slide-up whitespace-normal break-words text-sm"
-
-                // className="text-left justify-start h-auto p-4 hover:bg-secondary transition-all duration-300 animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => handleSuggestionClick(suggestion)}
               >
@@ -198,7 +196,6 @@ const ChatInterface = () => {
                     <Bot className="w-4 h-4 text-primary-foreground" />
                   </div>
                 )}
-
                 <div
                   className={cn(
                     "max-w-[80%] rounded-2xl px-4 py-3 shadow-card",
@@ -209,7 +206,6 @@ const ChatInterface = () => {
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
                 </div>
-
                 {message.type === 'user' && (
                   <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
                     <User className="w-4 h-4 text-secondary-foreground" />
@@ -233,6 +229,9 @@ const ChatInterface = () => {
                 </div>
               </div>
             )}
+
+            {/* ✅ Scroll target */}
+            <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
       )}
@@ -245,7 +244,7 @@ const ChatInterface = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask me anything about anurag..."
+            placeholder="Ask me anything about Anurag..."
             className="flex-1 bg-chat-input border-border focus:border-primary transition-colors"
             disabled={isLoading}
           />
