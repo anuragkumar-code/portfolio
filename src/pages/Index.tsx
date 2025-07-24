@@ -13,7 +13,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-background text-foreground">
-      {/* Header */}
       <PortfolioHeader onResumeClick={() => setIsResumeOpen(true)} />
       
       {/* Main Chat Interface */}
