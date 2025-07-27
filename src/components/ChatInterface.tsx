@@ -14,6 +14,8 @@ interface Message {
 }
 
 const ChatInterface = () => {
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -74,16 +76,11 @@ const ChatInterface = () => {
   const [fadeKey, setFadeKey] = useState(0);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {
-    if (inputRef.current) inputRef.current.focus();
+    inputRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -91,9 +88,29 @@ const ChatInterface = () => {
       setIntroIndex((prev) => (prev + 1) % jarwisIntros.length);
       setSuggestionIndex((prev) => (prev + 1) % suggestionGroups.length);
       setFadeKey((prev) => prev + 1);
-    }, 20000);
+    }, 25000);
     return () => clearInterval(interval);
   }, []);
+
+  const simulateTyping = async (
+    fullText: string,
+    messageId: string,
+    delay: number = 2
+  ) => {
+    setTypingMessageId(messageId);
+    for (let i = 0; i < fullText.length; i++) {
+      await new Promise((res) => setTimeout(res, delay));
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === messageId
+            ? { ...msg, content: fullText.slice(0, i + 1) }
+            : msg
+        )
+      );
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    setTypingMessageId(null);
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -102,32 +119,40 @@ const ChatInterface = () => {
       id: Date.now().toString(),
       type: 'user',
       content: input,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
-    let response;
-    let error: any = null;
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        response = await fetchChatAnswer(userMessage.content);
-        error = null;
-        break;
-      } catch (err: any) {
-        error = err;
-      }
+    const assistantId = (Date.now() + 1).toString();
+    const placeholderMessage: Message = {
+      id: assistantId,
+      type: "assistant",
+      content: "Thinking...",
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, placeholderMessage]);
+
+    try {
+      const response = await fetchChatAnswer(userMessage.content);
+
+      // Simulate typing effect for the actual response
+      await simulateTyping(response.answer, assistantId);
+    } catch (err: any) {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantId
+            ? {
+                ...msg,
+                content: `Sorry, there was an error fetching the answer. ${err.message || ""}`,
+              }
+            : msg
+        )
+      );
     }
 
-    const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      type: 'assistant',
-      content: response?.answer || `Sorry, there was an error fetching the answer. ${error?.message || ''}`,
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, assistantMessage]);
     setIsLoading(false);
   };
 
@@ -148,7 +173,7 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto">
-      {/* Welcome Message */}
+      {/* Welcome */}
       {messages.length === 1 && (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-fade-in">
           <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center mb-6 animate-glow-pulse">
@@ -157,7 +182,6 @@ const ChatInterface = () => {
           <h2 className="text-3xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
             Ask Me Anything
           </h2>
-
           <p key={fadeKey} className="text-muted-foreground mb-8 max-w-md">
             {jarwisIntros[introIndex]}
           </p>
@@ -204,7 +228,12 @@ const ChatInterface = () => {
                       : 'bg-chat-assistant text-foreground'
                   )}
                 >
-                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  <p className="text-sm leading-relaxed">
+                    {message.content}
+                    {typingMessageId === message.id && (
+                      <span className="inline-block animate-typing">...</span>
+                    )}
+                  </p>
                 </div>
                 {message.type === 'user' && (
                   <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
@@ -213,24 +242,6 @@ const ChatInterface = () => {
                 )}
               </div>
             ))}
-
-            {/* Loading indicator */}
-            {isLoading && (
-              <div className="flex gap-3 justify-start animate-slide-up">
-                <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-primary-foreground" />
-                </div>
-                <div className="bg-chat-assistant rounded-2xl px-4 py-3 shadow-card">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-typing"></div>
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-typing" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-typing" style={{ animationDelay: '0.4s' }}></div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ✅ Scroll target */}
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>

@@ -135,6 +135,10 @@ export default {
 					'0%': { opacity: '0.4' },
 					'50%': { opacity: '1' },
 					'100%': { opacity: '0.4' }
+				},
+				'blink': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0' },
 				}
 			},
 			animation: {
@@ -143,7 +147,8 @@ export default {
 				'fade-in': 'fade-in 0.3s ease-out',
 				'slide-up': 'slide-up 0.4s ease-out',
 				'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
-				'typing': 'typing 1.4s ease-in-out infinite'
+				'typing': 'typing 1.4s ease-in-out infinite',
+				'blink': 'blink 1s step-start infinite'
 			}
 		}
 	},
